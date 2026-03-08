@@ -1,12 +1,29 @@
 import type { OrderCardProps } from '@/types'
 
-const OrderCard = ({ order }: OrderCardProps): JSX.Element => {
-  // Extract order number from ID (last 6 characters)
-  const orderNumber = order.id.slice(-6).toUpperCase()
+const OrderCard = ({ order, status, isNew }: OrderCardProps): JSX.Element => {
+  const statusBorder =
+    status === 'received'
+      ? 'border-blue-700/80 dark:border-blue-700/60'
+      : status === 'inProgress'
+        ? 'border-amber-700/80 dark:border-amber-700/60'
+        : status === 'readyToPickup'
+          ? 'border-emerald-700/80 dark:border-emerald-700/60'
+          : 'border-gray-300/80 dark:border-gray-600/60'
 
   return (
-    <div className="inline-block mr-2 border border-gray-200 rounded px-3 py-2 hover:bg-gray-50 transition-colors">
-      <span className="text-sm font-mono text-gray-700">{orderNumber}</span>
+    <div
+      className={[
+        'rounded-lg px-3 py-2 transition-colors',
+        'border border-current',
+        statusBorder,
+        'bg-white/70 dark:bg-white/5',
+        'hover:bg-white dark:hover:bg-white/10',
+        'text-gray-900 dark:text-gray-100',
+        isNew ? 'animate-border-pulse' : '',
+      ].join(' ')}
+      data-order-id={order.id}
+    >
+      <span className="text-sm font-mono">{order.id}</span>
     </div>
   )
 }

@@ -5,7 +5,8 @@ import OrderDashboard from '@components/OrderDashboard'
 import type { Order } from '@/types'
 
 // Mock fetch
-global.fetch = vi.fn() as typeof fetch
+const mockFetch = vi.fn()
+globalThis.fetch = mockFetch as typeof fetch
 
 describe('OrderDashboard', () => {
   let queryClient: QueryClient
@@ -22,8 +23,7 @@ describe('OrderDashboard', () => {
   })
 
   it('displays loading state initially', () => {
-
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockImplementation(() => new Promise(() => {})) // Never resolves
+    mockFetch.mockImplementation(() => new Promise(() => {})) // Never resolves
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -37,7 +37,7 @@ describe('OrderDashboard', () => {
   it('displays orders grouped by status', async () => {
     const mockOrders: Order[] = [
       {
-        id: '1',
+        id: '100001',
         customer_name: 'John Doe',
         items: ['Burger'],
         status: 'received',
@@ -45,24 +45,24 @@ describe('OrderDashboard', () => {
         updated_at: '2024-01-01T10:00:00',
       },
       {
-        id: '2',
+        id: '100002',
         customer_name: 'Jane Smith',
         items: ['Pizza'],
-        status: 'in progress',
+        status: 'inProgress',
         created_at: '2024-01-01T11:00:00',
         updated_at: '2024-01-01T11:00:00',
       },
       {
-        id: '3',
+        id: '100003',
         customer_name: 'Bob Johnson',
         items: ['Tacos'],
-        status: 'ready to pickup',
+        status: 'readyToPickup',
         created_at: '2024-01-01T12:00:00',
         updated_at: '2024-01-01T12:00:00',
       },
     ]
 
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => mockOrders,
     } as Response)
@@ -74,14 +74,26 @@ describe('OrderDashboard', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Received')).toBeInTheDocument()
-      expect(screen.getByText('In Progress')).toBeInTheDocument()
-      expect(screen.getByText('Ready to Pickup')).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { name: /New Orders/i })
+      ).toBeInTheDocument()
+
+      expect(
+        screen.getByRole('heading', { name: /In Progress/i })
+      ).toBeInTheDocument()
+
+      expect(
+        screen.getByRole('heading', { name: /Ready for Pickup/i })
+      ).toBeInTheDocument()
     })
+
+    expect(screen.getByText('100001')).toBeInTheDocument()
+    expect(screen.getByText('100002')).toBeInTheDocument()
+    expect(screen.getByText('100003')).toBeInTheDocument()
   })
 
   it('displays error message on fetch failure', async () => {
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('Network error'))
+    mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
     render(
       <QueryClientProvider client={queryClient}>

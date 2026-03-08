@@ -73,7 +73,7 @@ def test_update_order_status():
         old_status = orders[0]["status"]
         
         # Update status
-        new_status = "in progress" if old_status != "in progress" else "ready to pickup"
+        new_status = "inProgress" if old_status != "inProgress" else "readyToPickup"
         response = client.put(f"/api/orders/{order_id}/status?status={new_status}")
         assert response.status_code == 200
         result = response.json()
@@ -98,7 +98,7 @@ def test_update_order_status_invalid():
 
 def test_update_order_status_not_found():
     """Test updating status of non-existent order"""
-    response = client.put("/api/orders/non-existent-id/status?status=in progress")
+    response = client.put("/api/orders/non-existent-id/status?status=inProgress")
     assert response.status_code == 200
     assert response.json() == {"error": "Order not found"}
 
@@ -131,6 +131,6 @@ def test_orders_grouped_by_status():
     assert len(status_groups) > 0
     
     # Verify all statuses are valid
-    valid_statuses = ["received", "in progress", "ready to pickup"]
+    valid_statuses = ["received", "inProgress", "readyToPickup"]
     for status in status_groups.keys():
         assert status in valid_statuses

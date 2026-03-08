@@ -5,7 +5,7 @@ import type { Order } from '@/types'
 
 describe('OrderCard', () => {
   const mockOrder: Order = {
-    id: '123e4567-e89b-12d3-a456-426614174000',
+    id: '123456',
     customer_name: 'John Doe',
     items: ['Burger', 'Fries', 'Coke'],
     status: 'received',
@@ -16,8 +16,7 @@ describe('OrderCard', () => {
   it('renders order number correctly', () => {
     render(<OrderCard order={mockOrder} />)
     
-    // Should show last 6 characters of ID in uppercase
-    expect(screen.getByText(/174000/)).toBeInTheDocument()
+    expect(screen.getByText('123456')).toBeInTheDocument()
   })
 
   it('displays order number in monospace font', () => {
@@ -26,4 +25,9 @@ describe('OrderCard', () => {
     expect(orderNumber).toBeInTheDocument()
   })
 
+  it('renders only numeric order id (no prefix)', () => {
+    render(<OrderCard order={mockOrder} />)
+    const orderNumber = screen.getByText('123456')
+    expect(orderNumber.textContent).toBe('123456')
+  })
 })
